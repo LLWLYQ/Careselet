@@ -8,6 +8,7 @@
   <link href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.css" rel="stylesheet">
   <title>你觉得你可以杀死我</title>
   <script src="./js/jquery-3.0.0/jquery-3.0.0.min.js"></script>
+  <script src="https://cdn.bootcss.com/jquery-cookie/1.4.1/jquery.cookie.js"></script>
   <script src="./js/js.js"></script>
   <link rel="stylesheet" href="./css/style.css">
   <style>
@@ -326,6 +327,8 @@ background-color: #F2F2F2;
         $( ".Fc" ).on("click","li",function diu() {
         $(this).addClass("current").siblings().removeClass("current");
         LOneId = $(this).data("id")
+        var goodsID = [LOneId]
+        sessionStorage.setItem("GOODSID",goodsID)
         $('.Fc1 li').remove()
         let GoodsUrl = 'http://test1.yishangm.com/api/pc/goods_category/'+LOneId+''
         $.ajax({
@@ -367,6 +370,8 @@ background-color: #F2F2F2;
               $( ".Fc1 li" ).on("click", function() {
                $('.DB .span3').remove()
                 var LTwoId = $(this).data("id")
+                var goodsID = [LOneId,LTwoId]
+                sessionStorage.setItem("GOODSID",goodsID)
                 $('.Fc2 li').remove()
                 let goodsUrl = 'http://test1.yishangm.com/api/pc/goods_category/'+LTwoId+''
                 $.ajax({
@@ -407,6 +412,8 @@ background-color: #F2F2F2;
                         $('.DB .span3').remove()
                         var LThreeId = $(this).data("id")
                         $('.Fc3 li').remove()
+                        var goodsID = [LOneId,LTwoId,LThreeId]
+                        sessionStorage.setItem("GOODSID",goodsID)
                         let gooDsUrl = 'http://test1.yishangm.com/api/pc/goods_category/'+LThreeId+''
                         $.ajax({
                           type:'get',
@@ -422,19 +429,13 @@ background-color: #F2F2F2;
                               $('.Fc3').append('<li data-id="'+LRid+'">'+LRname+'<i class="fa fa-chevron-right" style="font-size:12px;float:right;margin:5px 40px 0 0;"></i></li>')
                               //////////
                               $(".Fc3 li").on("click",function(){
+                                var LFourId = $(this).data("id")
                                 $(this).addClass("current").siblings().removeClass("current");
                                 $('.DB .span3').remove()
                                 $('.DB ').append('<span class="span3" style="color:#1170BC;">'+'>'+$(this).text()+'</span>')
-                              })
-                            })
-                            $(".nextBtn").on("click",function(){
-                              var goodsID = [LOneId,LTwoId,LThreeId]
-                              console.log(goodsID)
-                              $.ajax({
-                                type:'GET',
-                                url:'http://test1.yishangm.com/api/pc/goods_spec/'+String(goodsID)+''+'/0',
-                                success:function(data){
-                                }
+                                var goodsID = [LOneId,LTwoId,LThreeId,LFourId]
+                                var ses = sessionStorage.setItem("GOODSID",goodsID)
+                                /*console.log(sessionStorage.getItem("GOODSID"))*/
                               })
                             })
                           },
@@ -464,7 +465,19 @@ background-color: #F2F2F2;
             }
         });
     });
-   
-  });
+      $(".nextBtn").on("click",function(){
+        $.ajax({
+          type:'POST',
+          url:'http://test1.yishangm.com/api/pc/store_in_session',
+          data:{
+            cate_path:sessionStorage.getItem("GOODSID")
+          },
+          success:function(data){
+            
+            $.cookie("diu",data.data)
+          }
+        })
+      })
+  })
 </script>
 </html>
